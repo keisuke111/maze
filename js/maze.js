@@ -23,7 +23,7 @@ const printMaze = ary => {
               : y == 1 ? "𪚥"
               : y == 2 ? "◎"
               : y == 3 ? "●"
-              :          "これが表示されたら自殺する"
+              :          undefined
             )
 
             row.appendChild(part)
@@ -46,7 +46,7 @@ const createMaze = size => {
         [...Array(15)].map(x => [...Array(15)].map(x => 0))
     )
         .map((x, i) => 
-            x.map((y, j)=> 
+            x.map((y, j) => 
                 i == 0 || i == size - 1 || j == 0 || j == size - 1 ? 1 // 外壁
               : i % 2 == 0 && j % 2 == 0                           ? 1 // 内壁
               : i == 1 && j == 1                                   ? 2 // スタート
@@ -84,5 +84,5 @@ const createMaze = size => {
 window.onload = _ => {
     let map = createMaze(15);
     printMaze(map);
-    let ansFlg = false;
+    let answered = false;
 }
