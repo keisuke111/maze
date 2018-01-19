@@ -1,11 +1,70 @@
+// // 深さ優先探索
+// const dfs = (ary, y, x, flg) => {
+//     if (flg) {
+//         // 既にゴールしているため探索しない
+//     } else {
+//         let count = 0;  // 未探索分岐の数
+//
+//         if (ary[y - 1][x] == 0 || ary[y - 1][x] == 3) {
+//             count++;
+//         }
+//         if (ary[y + 1][x] == 0 || ary[y + 1][x] == 3) {
+//             count++;
+//         }
+//         if (ary[y][x - 1] == 0 || ary[y][x - 1] == 3) {
+//             count++;
+//         }
+//         if (ary[y][x + 1] == 0 || ary[y][x + 1] == 3) {
+//             count++;
+//         }
+//
+//     }
+//
+//     if (ary[y][x] == 3) {
+//         ary[y][x] = 4;  // 現在地を探索済に変更
+//     } else {
+//         mAry[y][x] = 4;  // 現在地を探索済に変更
+//
+//         if (flg == 0) {
+//             ansStack.push(y + " " + x);
+//
+//             if (mAry[y - 1][x] == 0 || mAry[y - 1][x] == 3) {
+//                 dfs(mAry, y - 1, x);
+//                 count--;
+//             }
+//             if (mAry[y + 1][x] == 0 || mAry[y + 1][x] == 3) {
+//                 dfs(mAry, y + 1, x);
+//                 count--;
+//             }
+//             if (mAry[y][x - 1] == 0 || mAry[y][x - 1] == 3) {
+//                 dfs(mAry, y, x - 1);
+//                 count--;
+//             }
+//             if (mAry[y][x + 1] == 0 || mAry[y][x + 1] == 3) {
+//                 dfs(mAry, y, x + 1);
+//                 count--;
+//             }
+//             if (count == 0) {
+//                 ansStack.pop();
+//             }
+//         }
+//     }
+// }
+
+// 棒があるか確認
+const isExistsWall = (ary, y, x) => {
+    if (ary[y][x] == 1) {
+        return false;
+    } else {
+        return true;
+    }
+}
+
 // 表示
-const printMap = () => {
-    for (let i = 0; i < mapAry.length; i++) {
-        for (let j = 0; j < mapAry[i].length; j++) {
-            switch (mapAry[i][j]) {
-                case -1:
-                    document.write("𪚥");
-                    break;
+const printMaze = (ary) => {
+    for (let i = 0; i < ary.length; i++) {
+        for (let j = 0; j < ary[i].length; j++) {
+            switch (ary[i][j]) {
                 case 0:
                     document.write("　");
                     break;
@@ -18,163 +77,90 @@ const printMap = () => {
                 case 3:
                     document.write("●");
                     break;
-                case 4:
-                    document.write("■");
-                    break;
-                case 5:
-                    document.write("　");
-                    break;
             }
         }
         document.write("<br>");
     }
-    document.write("<br>");
 }
 
-// 壁があるかのチェック関数
-const isCheck = (ary, y, x) => {
-    if (ary[y][x] == 1) {
-        return false;
-    } else {
-        return true;
-    }
-}
+// 迷路作成
+const createMaze = () => {
 
-// 道の数
-const rootCount = (ary, y, x) => {
-    let count = 0;
-    if (ary[y - 1][x] == 0 || ary[y - 1][x] == 3) {
-        count++;
-    }
-    if (ary[y + 1][x] == 0 || ary[y + 1][x] == 3) {
-        count++;
-    }
-    if (ary[y][x - 1] == 0 || ary[y][x - 1] == 3) {
-        count++;
-    }
-    if (ary[y][x + 1] == 0 || ary[y][x + 1] == 3) {
-        count++;
+    const SIZE = 15;
+
+    let mazeAry = new Array(SIZE);
+    for (let i = 0; i < mazeAry.length; i++) {
+        mazeAry[i] = new Array(SIZE);
     }
 
-    return count;
-}
-
-// 深さ優先探索
-const dfs = (mAry, y, x) => {
-    let count = rootCount(mAry, y, x);  // 未探索分岐の数
-    if (mAry[y][x] == 3) {
-        mAry[y][x] = 4;  // 現在地を探索済に変更
-
-        console.log("GOAL");
-        printMap();
-    } else {
-        mAry[y][x] = 4;  // 現在地を探索済に変更
-
-        if (mAry[y - 1][x] == 0 || mAry[y - 1][x] == 3) {
-            dfs(mAry, y - 1, x);
-            count--;
-        }
-        if (mAry[y + 1][x] == 0 || mAry[y + 1][x] == 3) {
-            dfs(mAry, y + 1, x);
-            count--;
-        }
-        if (mAry[y][x - 1] == 0 || mAry[y][x - 1] == 3) {
-            dfs(mAry, y, x - 1);
-            count--;
-        }
-        if (mAry[y][x + 1] == 0 || mAry[y][x + 1] == 3) {
-            dfs(mAry, y, x + 1);
-            count--;
-        }
-        if (count == 0) {
-            mAry[y][x] = 5;
+    // 初期状態の作成
+    // 1:壁
+    // 0:道
+    // 2:スタート
+    // 3:ゴール
+    for (let i = 0; i < mazeAry.length; i++) {
+        for (let j = 0; j < mazeAry[i].length; j++) {
+            if (i == 0 || i == SIZE - 1 || j == 0 || j == SIZE - 1 ) {
+                mazeAry[i][j] = 1;     // 外壁
+            } else if (i % 2 == 0 && j % 2 == 0) {
+                mazeAry[i][j] = 1;      // 内壁
+            } else if (i == 1 && j == 1) {
+                mazeAry[i][j] = 2;    // スタート
+            } else if (i == SIZE - 2 && j == SIZE - 2) {
+                mazeAry[i][j] = 3;    // ゴール
+            } else {
+                mazeAry[i][j] = 0;      // 道
+            }
         }
     }
-}
 
-const SIZE = 15;    // 5以上の奇数を指定(5~133)
+    // 棒伸ばし処理
+    for (let i = 2; i < SIZE - 2; i += 2) {
+        for (let j = 2; j < SIZE - 2; j += 2) {
 
-// 二次元配列の宣言
-let mapAry = new Array(SIZE);
-for (let i = 0; i < mapAry.length; i++) {
-    mapAry[i] = new Array(SIZE);
-}
-
-// 二次元配列に値をセット(初期配置)
-// -1:外壁
-// 1:内壁
-// 0:道
-// 2:スタート
-// 3:ゴール
-// 4:正解
-// 5:不正解
-for (let i = 0; i < mapAry.length; i++) {
-    for (let j = 0; j < mapAry[i].length; j++) {
-        if (i == 0 || i == SIZE - 1 || j == 0 || j == SIZE - 1 ) {
-            mapAry[i][j] = -1;
-        } else if (i % 2 == 0 && j % 2 == 0) {
-            mapAry[i][j] = 1;
-        } else if (i == 1 && j == 1) {
-            mapAry[i][j] = 2;
-        } else if (i == SIZE - 2 && j == SIZE - 2) {
-            mapAry[i][j] = 3;
-        } else {
-            mapAry[i][j] = 0;
-        }
-    }
-}
-
-printMap();
-
-// 棒伸ばし
-const create = () => {
-
-}
-for (let i = 0; i < mapAry.length; i++) {
-    for (let j = 0; j < mapAry[i].length; j++) {
-        // 内壁
-        if (i % 2 == 0 && j % 2 == 0 && mapAry[i][j] != -1) {
             let rm;
+
             if(i == 2) {    // 1行目の内壁
                 rm = Math.floor(Math.random() * 4);
             } else {        // それ以降の内壁
                 rm = Math.floor(Math.random() * 3) + 1;
             }
+
             switch (rm) {
                 case 0: // 上
-                    if (isCheck(mapAry, i - 1, j)) {
-                        mapAry[i - 1][j] = 1;
-                    } else {
-                        j--;
-                    }
+                    mazeAry[i - 1][j] = 1;
                     break;
                 case 1: // 下
-                    if (isCheck(mapAry, i + 1, j)) {
-                        mapAry[i + 1][j] = 1;
+                    if (isExistsWall(mazeAry, i + 1, j)) {
+                        mazeAry[i + 1][j] = 1;
                     } else {
-                        j--;
+                        j -= 2;
                     }
                     break;
                 case 2: // 右
-                    if (isCheck(mapAry, i, j + 1)) {
-                        mapAry[i][j + 1] = 1;
+                    if (isExistsWall(mazeAry, i, j + 1)) {
+                        mazeAry[i][j + 1] = 1;
                     } else {
-                        j--;
+                        j -= 2;
                     }
                     break;
                 case 3: // 左
-                    if (isCheck(mapAry, i, j - 1)) {
-                        mapAry[i][j - 1] = 1;
+                    if (isExistsWall(mazeAry, i, j - 1)) {
+                        mazeAry[i][j - 1] = 1;
                     } else {
-                        j--;
+                        j -= 2;
                     }
                     break;
             }
         }
     }
+
+    return mazeAry;
 }
 
-printMap();
+// window.onload = () => {
+    let map = createMaze();
+    printMaze(map);
 
-// 探索スタート
-dfs(mapAry, 1, 1);
+    let ansFlg = false;
+// }
