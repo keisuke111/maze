@@ -1,0 +1,15 @@
+#maze { 
+    display       : flex;
+    flex-direction: column;
+}
+
+#maze-row {
+    display: flex;
+}
+
+#maze-part {
+    align-items     : center;
+    display         : inline-flex;
+    justify-content : center;
+    width           : 1rem;
+}
