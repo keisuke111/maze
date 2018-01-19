@@ -81,9 +81,8 @@ const createMaze = size => {
     return mazeAry;
 }
 
-window.onload = () => {
+window.onload = _ => {
     let map = createMaze(15);
-    console.log(map)
     printMaze(map);
     let ansFlg = false;
 }
