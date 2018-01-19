@@ -1,166 +1,89 @@
-// // 深さ優先探索
-// const dfs = (ary, y, x, flg) => {
-//     if (flg) {
-//         // 既にゴールしているため探索しない
-//     } else {
-//         let count = 0;  // 未探索分岐の数
-//
-//         if (ary[y - 1][x] == 0 || ary[y - 1][x] == 3) {
-//             count++;
-//         }
-//         if (ary[y + 1][x] == 0 || ary[y + 1][x] == 3) {
-//             count++;
-//         }
-//         if (ary[y][x - 1] == 0 || ary[y][x - 1] == 3) {
-//             count++;
-//         }
-//         if (ary[y][x + 1] == 0 || ary[y][x + 1] == 3) {
-//             count++;
-//         }
-//
-//     }
-//
-//     if (ary[y][x] == 3) {
-//         ary[y][x] = 4;  // 現在地を探索済に変更
-//     } else {
-//         mAry[y][x] = 4;  // 現在地を探索済に変更
-//
-//         if (flg == 0) {
-//             ansStack.push(y + " " + x);
-//
-//             if (mAry[y - 1][x] == 0 || mAry[y - 1][x] == 3) {
-//                 dfs(mAry, y - 1, x);
-//                 count--;
-//             }
-//             if (mAry[y + 1][x] == 0 || mAry[y + 1][x] == 3) {
-//                 dfs(mAry, y + 1, x);
-//                 count--;
-//             }
-//             if (mAry[y][x - 1] == 0 || mAry[y][x - 1] == 3) {
-//                 dfs(mAry, y, x - 1);
-//                 count--;
-//             }
-//             if (mAry[y][x + 1] == 0 || mAry[y][x + 1] == 3) {
-//                 dfs(mAry, y, x + 1);
-//                 count--;
-//             }
-//             if (count == 0) {
-//                 ansStack.pop();
-//             }
-//         }
-//     }
-// }
-
 // 棒があるか確認
-const isExistsWall = (ary, y, x) => {
-    if (ary[y][x] == 1) {
-        return false;
-    } else {
-        return true;
-    }
-}
+const isExistsWall = (ary, y, x) => ary[y][x] == 1 ? false : true
+
 
 // 表示
-const printMaze = (ary) => {
-    for (let i = 0; i < ary.length; i++) {
-        for (let j = 0; j < ary[i].length; j++) {
-            switch (ary[i][j]) {
-                case 0:
-                    document.write("　");
-                    break;
-                case 1:
-                    document.write("𪚥");
-                    break;
-                case 2:
-                    document.write("◎");
-                    break;
-                case 3:
-                    document.write("●");
-                    break;
-            }
-        }
-        document.write("<br>");
-    }
+const printMaze = ary => {
+
+    let section = document.createElement("section");
+    section.id = "maze"
+
+    document.body.appendChild(section)
+    
+    ary.map(x => {
+        let row = document.createElement("div");
+        row.id = "maze-row"
+
+        x.map(y => {
+            let part = document.createElement("div");
+            part.id = "maze-part"
+
+            part.innerText = (
+                y == 0 ? ""
+              : y == 1 ? "𪚥"
+              : y == 2 ? "◎"
+              : y == 3 ? "●"
+              :          "これが表示されたら自殺する"
+            )
+
+            row.appendChild(part)
+        })
+        
+        section.appendChild(row);
+    })
 }
 
 // 迷路作成
-const createMaze = () => {
-
-    const SIZE = 15;
-
-    let mazeAry = new Array(SIZE);
-    for (let i = 0; i < mazeAry.length; i++) {
-        mazeAry[i] = new Array(SIZE);
-    }
-
+const createMaze = size => {
+  
     // 初期状態の作成
     // 1:壁
     // 0:道
     // 2:スタート
     // 3:ゴール
-    for (let i = 0; i < mazeAry.length; i++) {
-        for (let j = 0; j < mazeAry[i].length; j++) {
-            if (i == 0 || i == SIZE - 1 || j == 0 || j == SIZE - 1 ) {
-                mazeAry[i][j] = 1;     // 外壁
-            } else if (i % 2 == 0 && j % 2 == 0) {
-                mazeAry[i][j] = 1;      // 内壁
-            } else if (i == 1 && j == 1) {
-                mazeAry[i][j] = 2;    // スタート
-            } else if (i == SIZE - 2 && j == SIZE - 2) {
-                mazeAry[i][j] = 3;    // ゴール
-            } else {
-                mazeAry[i][j] = 0;      // 道
-            }
-        }
-    }
+
+    let mazeAry = (
+        [...Array(15)].map(x => [...Array(15)].map(x => 0))
+    )
+        .map((x, i) => 
+            x.map((y, j)=> 
+                i == 0 || i == size - 1 || j == 0 || j == size - 1 ? 1 // 外壁
+              : i % 2 == 0 && j % 2 == 0                           ? 1 // 内壁
+              : i == 1 && j == 1                                   ? 2 // スタート
+              : i == size - 2 && j == size - 2                     ? 3 // ゴール
+              :                                                      0 // 道
+          )
+        )
+
 
     // 棒伸ばし処理
-    for (let i = 2; i < SIZE - 2; i += 2) {
-        for (let j = 2; j < SIZE - 2; j += 2) {
+    for (let i = 2; i < size - 2; i += 2) {
+        for (let j = 2; j < size - 2; j += 2) {
 
-            let rm;
+            const rm = i == 2 ? Math.floor(Math.random() * 4) 
+                     :          Math.floor(Math.random() * 3) + 1
 
-            if(i == 2) {    // 1行目の内壁
-                rm = Math.floor(Math.random() * 4);
-            } else {        // それ以降の内壁
-                rm = Math.floor(Math.random() * 3) + 1;
-            }
+            rm == 0 ? (mazeAry[i - 1][j] = 1)
+          : rm == 1 ? 
+              isExistsWall(mazeAry, i + 1, j) ? (mazeAry[i + 1][j] = 1)
+            :                                   (j -= 2)
+          : rm == 2 ? 
+              isExistsWall(mazeAry, i, j + 1) ? (mazeAry[i][j + 1] = 1)
+            :                                   (j -= 2)
+          : rm == 3 ?
+              isExistsWall(mazeAry, i, j - 1) ? (mazeAry[i][j - 1] = 1)
+            :                                   (j -= 2)
+          :                                     undefined
 
-            switch (rm) {
-                case 0: // 上
-                    mazeAry[i - 1][j] = 1;
-                    break;
-                case 1: // 下
-                    if (isExistsWall(mazeAry, i + 1, j)) {
-                        mazeAry[i + 1][j] = 1;
-                    } else {
-                        j -= 2;
-                    }
-                    break;
-                case 2: // 右
-                    if (isExistsWall(mazeAry, i, j + 1)) {
-                        mazeAry[i][j + 1] = 1;
-                    } else {
-                        j -= 2;
-                    }
-                    break;
-                case 3: // 左
-                    if (isExistsWall(mazeAry, i, j - 1)) {
-                        mazeAry[i][j - 1] = 1;
-                    } else {
-                        j -= 2;
-                    }
-                    break;
-            }
         }
     }
 
     return mazeAry;
 }
 
-// window.onload = () => {
-    let map = createMaze();
+window.onload = () => {
+    let map = createMaze(15);
+    console.log(map)
     printMaze(map);
-
     let ansFlg = false;
-// }
+}
