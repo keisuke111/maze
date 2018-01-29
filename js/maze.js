@@ -1,4 +1,4 @@
-// 棒があるか確認
+// 壁があるか確認
 const isExistsWall = (ary, y, x) => ary[y][x] == 1 ? false : true
 
 // 表示
@@ -59,21 +59,13 @@ const createMaze = size => {
     for (let i = 2; i < size - 2; i += 2) {
         for (let j = 2; j < size - 2; j += 2) {
 
-            const rm = i == 2 ? Math.floor(Math.random() * 4)
-                     :          Math.floor(Math.random() * 3) + 1
+          const rm = Math.floor(Math.random() * 4)
 
-            rm == 0 ? (mazeAry[i - 1][j] = 1)
-          : rm == 1 ?
-              isExistsWall(mazeAry, i + 1, j) ? (mazeAry[i + 1][j] = 1)
-            :                                   (j -= 2)
-          : rm == 2 ?
-              isExistsWall(mazeAry, i, j + 1) ? (mazeAry[i][j + 1] = 1)
-            :                                   (j -= 2)
-          : rm == 3 ?
-              isExistsWall(mazeAry, i, j - 1) ? (mazeAry[i][j - 1] = 1)
-            :                                   (j -= 2)
-          :                                     undefined
-
+          rm == 0 ? (mazeAry[i - 1][j] = 1)     // 上
+        : rm == 1 ? (mazeAry[i + 1][j] = 1)     // 下
+        : rm == 2 ? (mazeAry[i][j - 1] = 1)     // 左
+        : rm == 3 ? (mazeAry[i][j + 1] = 1)     // 右
+        : undefined
         }
     }
 
@@ -81,7 +73,9 @@ const createMaze = size => {
 }
 
 window.onload = _ => {
-    let map = createMaze(33);   // 5以上の奇数
+    const SIZE = 13;
+
+    let map = createMaze(SIZE);   // 5以上の奇数
     printMaze(map);
-    let answered = false;
+    console.log(map);
 }
