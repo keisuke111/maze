@@ -1,32 +1,3 @@
-// 表示
-const printMaze = ary => {
-
-    let section = document.createElement("section");
-    section.id = "maze"
-
-    document.body.appendChild(section)
-
-    ary.map(x => {
-        let row = document.createElement("div");
-        row.id = "maze-row"
-
-        x.map(y => {
-            let part = document.createElement("div");
-            part.id = "maze-part"
-
-            part.innerText = (
-                y == 0 ? ""
-              : y == 1 ? "𪚥"
-              :          undefined
-            )
-
-            row.appendChild(part)
-        })
-
-        section.appendChild(row);
-    })
-}
-
 const EPSILON = 0.30;       // ε-greedy法：ε
 const ALPHA = 0.10;         // 学習率：α
 const GAMMA = 0.90;         // 割引率：γ
@@ -36,54 +7,34 @@ const GOAL_POINT = 100;     // ゴールのポイント
 const HIT_WALL_POINT = -5;  // 壁に当たった時のポイント
 const STEP_POINT = -1;      // 1ステッ プ経過のポイント
 
-const MAX_LEANING = 100;    // 最大学習回数
-const MAZE_SIZE = 13;       // 迷路のサイズ(1辺)
+const MAX_LEANING = 10000;  // 最大学習回数
+const MAZE_SIZE = 41;       // 迷路のサイズ(1辺)
 
 // 迷路生成(ランダム)
-// const MAZE_ARRAY = (
-//     [...Array(MAZE_SIZE)].map(x => [...Array(MAZE_SIZE)].map(x => 0))
-// )
-//     .map((x, i) =>
-//         x.map((y, j) =>
-//             i == 0 || i == MAZE_SIZE - 1 || j == 0 || j == MAZE_SIZE - 1 ? 1 // 外壁
-//           : i % 2 == 0 && j % 2 == 0                                     ? 1 // 内壁
-//           :                                                                0 // 道
-//       )
-//     )
-//
-//
-// // 棒伸ばし処理
-// for (let i = 2; i < MAZE_SIZE - 2; i += 2) {
-//     for (let j = 2; j < MAZE_SIZE - 2; j += 2) {
-//
-//       const rm = Math.floor(Math.random() * 4)
-//
-//       rm == 0 ? (MAZE_ARRAY[i - 1][j] = 1)     // 上
-//     : rm == 1 ? (MAZE_ARRAY[i + 1][j] = 1)     // 下
-//     : rm == 2 ? (MAZE_ARRAY[i][j - 1] = 1)     // 左
-//     : rm == 3 ? (MAZE_ARRAY[i][j + 1] = 1)     // 右
-//     : undefined
-//     }
-// }
+const MAZE_ARRAY = (
+    [...Array(MAZE_SIZE)].map(x => [...Array(MAZE_SIZE)].map(x => 0))
+)
+    .map((x, i) =>
+        x.map((y, j) =>
+            i == 0 || i == MAZE_SIZE - 1 || j == 0 || j == MAZE_SIZE - 1 ? 1 // 外壁
+          : i % 2 == 0 && j % 2 == 0                                     ? 1 // 内壁
+          :                                                                0 // 道
+      )
+    )
 
-// 迷路作成(最短20)
-const MAZE_ARRAY = [
-  [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-  [1, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1],
-  [1, 0, 1, 0, 1, 0, 1, 1, 1, 0, 1, 0, 1],
-  [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1],
-  [1, 1, 1, 0, 1, 1, 1, 0, 1, 1, 1, 1, 1],
-  [1, 0, 0, 0, 1, 0, 1, 0, 1, 0, 0, 0, 1],
-  [1, 1, 1, 0, 1, 1, 1, 0, 1, 0, 1, 0, 1],
-  [1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1],
-  [1, 0, 1, 1, 1, 1, 1, 0, 1, 0, 1, 0, 1],
-  [1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1],
-  [1, 1, 1, 0, 1, 1, 1, 0, 1, 0, 1, 1, 1],
-  [1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1],
-  [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
-];
+// 棒伸ばし処理
+for (let i = 2; i < MAZE_SIZE - 2; i += 2) {
+    for (let j = 2; j < MAZE_SIZE - 2; j += 2) {
 
-printMaze(MAZE_ARRAY);
+      const rm = Math.floor(Math.random() * 4)
+
+      rm == 0 ? (MAZE_ARRAY[i - 1][j] = 1)     // 上
+    : rm == 1 ? (MAZE_ARRAY[i + 1][j] = 1)     // 下
+    : rm == 2 ? (MAZE_ARRAY[i][j - 1] = 1)     // 左
+    : rm == 3 ? (MAZE_ARRAY[i][j + 1] = 1)     // 右
+    : undefined
+    }
+}
 
 let minStep = Number.MAX_VALUE;
 let minStepRoute = "";
@@ -159,6 +110,34 @@ const updateQ = (r, a) => {
     qAry[x][y][a] = qAry[x][y][a] + ALPHA * (r + GAMMA * qAry[nextX][nextY][maxA] - qAry[x][y][a]);
 }
 
+// 表示
+const printMaze = ary => {
+
+    let section = document.createElement("section");
+    section.id = "maze"
+
+    document.body.appendChild(section)
+
+    ary.map(x => {
+        let row = document.createElement("div");
+        row.id = "maze-row"
+
+        x.map(y => {
+            let part = document.createElement("div");
+            part.id = "maze-part"
+
+            part.innerText = (
+                y == 0 ? ""
+              : y == 1 ? "𪚥"
+              :          undefined
+            )
+
+            row.appendChild(part)
+        })
+
+        section.appendChild(row);
+    })
+}
 
 for (let i = 0; i < MAX_LEANING; i++) {
     // エージェントの初期化
@@ -196,3 +175,4 @@ for (let i = 0; i < MAX_LEANING; i++) {
 }
 
 console.log(minStepRoute);
+printMaze(MAZE_ARRAY);
