@@ -3,12 +3,12 @@ const ALPHA = 0.10;         // 学習率：α
 const GAMMA = 0.90;         // 割引率：γ
 const Q_MAX = 30;           // Qの初期値の最大値
 
+const STEP_POINT = -1;      // 1ステップ経過のポイント
 const GOAL_POINT = 100;     // ゴールのポイント
 const HIT_WALL_POINT = -5;  // 壁に当たった時のポイント
-const STEP_POINT = -1;      // 1ステッ プ経過のポイント
 
 const MAX_LEANING = 10000;  // 最大学習回数
-const MAZE_SIZE = 41;       // 迷路のサイズ(1辺)
+const MAZE_SIZE = 15;       // 迷路のサイズ(1辺)
 
 // 迷路生成(ランダム)
 const MAZE_ARRAY = (
@@ -146,7 +146,7 @@ for (let i = 0; i < MAX_LEANING; i++) {
     nextX = 1;
     nextY = 1;
     let step = 0;   // ステップ数
-    let stepRoute = "";
+    let stepRoute = [];
 
     let isGoal = false;
     while (!isGoal) {
@@ -155,7 +155,10 @@ for (let i = 0; i < MAX_LEANING; i++) {
         let a = eGreedy();
         let r = action(a);
         r += STEP_POINT;
-        stepRoute += "[" + nextY  + ", " + nextX + "] ";
+        stepRoute = stepRoute.concat({
+            nextX,
+            nextY
+        })
         updateQ(r, a);
 
         x = nextX;
