@@ -1,81 +1,58 @@
-// 壁があるか確認
-const isExistsWall = (ary, y, x) => ary[y][x] == 1 ? false : true
+const MAZE_ARRAY = createMaze(MAZE_SIZE);
 
-// 表示
-const printMaze = ary => {
+let minStep = Number.MAX_VALUE;
+let minRoute = "";
 
-    let section = document.createElement("section");
-    section.id = "maze"
+// Q値の初期化
+let qAry = createQ(MAZE_SIZE, Q_MAX)
 
-    document.body.appendChild(section)
+for (let i = 0; i < MAX_LEANING; i++) {
+    // エージェントの初期化
+    let agent = {
+        x: 1,
+        y: 1,
+        nextX: 1,
+        nextY: 1,
+        step: 0,
+        route: []
+    }
 
-    ary.map(x => {
-        let row = document.createElement("div");
-        row.id = "maze-row"
+    let isGoal = false;
 
-        x.map(y => {
-            let part = document.createElement("div");
-            part.id = "maze-part"
+    while (!isGoal) {
+        agent.step++;
 
-            part.innerText = (
-                y == 0 ? ""
-              : y == 1 ? "𪚥"
-              : y == 2 ? "◎"
-              : y == 3 ? "●"
-              :          undefined
-            )
+        let action = eGreedy(qAry, agent, EPSILON);
+        let reward = calcReward(action, agent, MAZE_ARRAY, HIT_WALL_POINT, GOAL_POINT);
+        reward += STEP_POINT;
+        agent.route.push([agent.nextX, agent.nextY])
+        updateQ(action, reward, qAry, agent, ALPHA, GAMMA);
 
-            row.appendChild(part)
-        })
+        // 現在地の更新
+        agent.x = agent.nextX;
+        agent.y = agent.nextY;
 
-        section.appendChild(row);
-    })
-}
-
-// 迷路作成
-const createMaze = size => {
-
-    // 初期状態の作成
-    // 1:壁
-    // 0:道
-    // 2:スタート
-    // 3:ゴール
-
-    let mazeAry = (
-        [...Array(size)].map(x => [...Array(size)].map(x => 0))
-    )
-        .map((x, i) =>
-            x.map((y, j) =>
-                i == 0 || i == size - 1 || j == 0 || j == size - 1 ? 1 // 外壁
-              : i % 2 == 0 && j % 2 == 0                           ? 1 // 内壁
-              : i == 1 && j == 1                                   ? 2 // スタート
-              : i == size - 2 && j == size - 2                     ? 3 // ゴール
-              :                                                      0 // 道
-          )
-        )
-
-
-    // 棒伸ばし処理
-    for (let i = 2; i < size - 2; i += 2) {
-        for (let j = 2; j < size - 2; j += 2) {
-
-          const rm = Math.floor(Math.random() * 4)
-
-          rm == 0 ? (mazeAry[i - 1][j] = 1)     // 上
-        : rm == 1 ? (mazeAry[i + 1][j] = 1)     // 下
-        : rm == 2 ? (mazeAry[i][j - 1] = 1)     // 左
-        : rm == 3 ? (mazeAry[i][j + 1] = 1)     // 右
-        : undefined
+        // ゴール判定
+        if (agent.x == MAZE_SIZE - 2 && agent.y == MAZE_SIZE - 2) {
+            isGoal = true;
         }
     }
 
-    return mazeAry;
+    if (agent.step < minStep) {
+        minStep = agent.step;
+        minRoute = agent.route;
+    }
+    console.log("learn:" + i + ", stop:" + agent.step + ", min:" + minStep);
 }
 
-window.onload = _ => {
-    const SIZE = 13;
+console.log(minRoute);
+printMaze(MAZE_ARRAY);
 
-    let map = createMaze(SIZE);   // 5以上の奇数
-    printMaze(map);
-    console.log(map);
+f = (x, i) => {
+    let m = Array.from(MAZE_ARRAY)
+    m[x[0]][x[1]] = 2;
+    printMaze(m)
+    minRoute[i + 1] && setTimeout(_ => f(minRoute[i + 1], i + 1) , 500)
 }
+
+f(minRoute[0], 0)
