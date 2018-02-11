@@ -8,4 +8,4 @@ const GOAL_POINT = 100;     // ゴールのポイント
 const HIT_WALL_POINT = -5;  // 壁に当たった時のポイント
 
 const MAX_LEANING = 10000;  // 最大学習回数
-const MAZE_SIZE = 11;       // 迷路のサイズ(1辺)
+const MAZE_SIZE = 31;       // 迷路のサイズ(1辺)

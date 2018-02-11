@@ -1,7 +1,7 @@
-const MAZE_ARRAY = createMaze(MAZE_SIZE);
+const MAZE_ARRAY = createMaze(MAZE_SIZE)
 
-let minStep = Number.MAX_VALUE;
-let minRoute = "";
+let minStep = Number.MAX_VALUE
+let minRoute
 
 // Q値の初期化
 let qAry = createQ(MAZE_SIZE, Q_MAX)
@@ -22,37 +22,28 @@ for (let i = 0; i < MAX_LEANING; i++) {
     while (!isGoal) {
         agent.step++;
 
-        let action = eGreedy(qAry, agent, EPSILON);
-        let reward = calcReward(action, agent, MAZE_ARRAY, HIT_WALL_POINT, GOAL_POINT);
-        reward += STEP_POINT;
+        let action = eGreedy(qAry, agent, EPSILON)
+        let reward = calcReward(action, agent, MAZE_ARRAY, HIT_WALL_POINT, GOAL_POINT)
+        reward += STEP_POINT
         agent.route.push([agent.nextX, agent.nextY])
-        updateQ(action, reward, qAry, agent, ALPHA, GAMMA);
+        updateQ(action, reward, qAry, agent, ALPHA, GAMMA)
 
         // 現在地の更新
-        agent.x = agent.nextX;
-        agent.y = agent.nextY;
+        agent.x = agent.nextX
+        agent.y = agent.nextY
 
         // ゴール判定
         if (agent.x == MAZE_SIZE - 2 && agent.y == MAZE_SIZE - 2) {
-            isGoal = true;
+            isGoal = true
         }
     }
 
     if (agent.step < minStep) {
-        minStep = agent.step;
-        minRoute = agent.route;
+        minStep = agent.step
+        minRoute = agent.route
     }
-    console.log("learn:" + i + ", stop:" + agent.step + ", min:" + minStep);
+    console.log("learn:" + i + ", stop:" + agent.step + ", min:" + minStep)
 }
 
-console.log(minRoute);
-printMaze(MAZE_ARRAY);
-
-f = (x, i) => {
-    let m = Array.from(MAZE_ARRAY)
-    m[x[0]][x[1]] = 2;
-    printMaze(m)
-    minRoute[i + 1] && setTimeout(_ => f(minRoute[i + 1], i + 1) , 500)
-}
-
-f(minRoute[0], 0)
+console.log(minRoute)
+shortestRoute(minRoute, 0, MAZE_ARRAY)
